@@ -4,11 +4,11 @@
 # Author: Feng Zhang
 # Date: 2020.9
 # Requirements:
-# python3=3.8.2
-# pysam=0.16.0.1
-# numpy=1.19.1
-# bedtools=v2.26.0
-# blat=v.36x7
+#     python3=3.8.2
+#     pysam=0.16.0.1
+#     numpy=1.19.1
+#     bedtools=v2.26.0
+#     blat=v.36x7
 #----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
@@ -202,7 +202,7 @@ def filterSnv(bed_in_path=0, bed_out_path=0, CUT=10):
     for line in fi:
         seq=line.rstrip().split('\t')
         this_tag=seq[0]+':'+seq[2]
-        if this_tag in CCC:
+        if this_tag in TYPE:
             TYPE[this_tag].append(seq[3])
         else:
             TYPE[this_tag]=[seq[3]]
