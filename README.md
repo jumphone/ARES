@@ -1,4 +1,6 @@
-# ARES
+
+<img src="/SupFiles/ARES_lgo.png" width="200">
+
 
 **ARES**: an **A**nnotation-free toolkit for identifying **R**na **E**diting **S**ites
 
