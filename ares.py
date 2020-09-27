@@ -4,11 +4,11 @@
 # Author: Feng Zhang
 # Date: 2020.9
 # Requirements:
-#     python3=3.8.2
-#     pysam=0.16.0.1
-#     numpy=1.19.1
-#     bedtools=v2.26.0
-#     blat=v.36x7
+# python3=3.8.2
+# pysam=0.16.0.1
+# numpy=1.19.1
+# bedtools=v2.26.0
+# blat=v.36x7
 #----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
@@ -376,9 +376,9 @@ def bed2flankfa(bed_in_path=0, ref_in_path=0, fa_out_path=0, AROUND=0, SEP='r'):
         this_seq_before = chrom[this_chr][this_add_start:this_start].upper()
         this_seq_after = chrom[this_chr][this_end:this_add_end].upper()
 
-        fo.write('>'+this_tag+'oBEFORE\n')
+        fo.write('>'+this_tag+SEP+'BEFORE\n')
         fo.write(this_seq_before+'\n')
-        fo.write('>'+this_tag+'oAFTER\n')
+        fo.write('>'+this_tag+SEP+'AFTER\n')
         fo.write(this_seq_after+'\n')
 
     fo.close()
@@ -452,7 +452,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10):
     l1=fi.readline()
     l2=fi.readline()
     while l1 !='':
-        this_id=l1.rstrip().split('o')[3]
+        this_id=l1.rstrip().split('r')[5]
         REF[this_id]=''
         l1=fi.readline()
         l2=fi.readline()
@@ -462,7 +462,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10):
     l1=fi.readline()
     l2=fi.readline()
     while l1 !='':
-        this_id=l1.rstrip().split('o')[3]
+        this_id=l1.rstrip().split('r')[5]
         REF[this_id]+=l1+l2
         l1=fi.readline()
         l2=fi.readline()
@@ -475,7 +475,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10):
     l1=fi.readline()
     l2=fi.readline()
     while l1 !='':
-        this_id=l1.rstrip().split('x')[3]
+        this_id=l1.rstrip().split('q')[5]
         QUERY[this_id]=''
         l1=fi.readline()
         l2=fi.readline()
@@ -486,7 +486,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10):
     l1=fi.readline()
     l2=fi.readline()
     while l1 !='':
-        this_id=l1.rstrip().split('x')[3]
+        this_id=l1.rstrip().split('q')[5]
         QUERY[this_id]+=l1+l2
         l1=fi.readline()
         l2=fi.readline()
