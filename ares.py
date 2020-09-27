@@ -463,7 +463,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
     l2=fi.readline()
     while l1 !='':
         this_id=l1.rstrip().split(SEPR)[5]
-        print(this_id)
+        #print(this_id)
         REF[this_id]+=l1+l2
         l1=fi.readline()
         l2=fi.readline()
