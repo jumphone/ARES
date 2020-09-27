@@ -4,11 +4,11 @@
 
 ### Requirements
 
-    python3=3.8.2
-    pysam=0.16.0.1
-    numpy=1.19.1
-    bedtools=v2.26.0
-    blat=v.36x7
+    python3  = 3.8.2
+    pysam    = 0.16.0.1
+    numpy    = 1.19.1
+    bedtools = v2.26.0
+    blat     = v.36x7
 
 Users can download binary files of bedtools and blat from: https://github.com/jumphone/ARES/tree/master/bin
 
