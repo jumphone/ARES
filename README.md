@@ -1,4 +1,4 @@
-<img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_logo_text.png" width="500">
+<img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_logo_text.png" width="360">
 
 ### Requirements
 
