@@ -1,5 +1,5 @@
 
-<img src="/SupFiles/ARES_lgo.png" width="200">
+<img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_logo.png" width="200">
 
 
 **A**nnotation-free toolkit for identifying **R**na **E**diting **S**ites
