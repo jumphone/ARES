@@ -3,7 +3,12 @@
 # Annotation-free toolkit for identifying Rna Editing Sites
 # Author: Feng Zhang
 # Date: 2020.9
-# Python3
+# Requirements:
+# python3=3.8.2
+# pysam=0.16.0.1
+# numpy=1.19.1
+# bedtools=v2.26.0
+# blat=v.36x7
 #----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
