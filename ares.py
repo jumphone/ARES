@@ -4,11 +4,11 @@
 # Author: Feng Zhang
 # Date: 2020.9
 # Requirements:
-# python3=3.8.2
-# pysam=0.16.0.1
-# numpy=1.19.1
-# bedtools=v2.26.0
-# blat=v.36x7
+#     python3=3.8.2
+#     pysam=0.16.0.1
+#     numpy=1.19.1
+#     bedtools=v2.26.0
+#     blat=v.36x7
 #----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
@@ -437,7 +437,7 @@ def blatWorker(q, ARG):
 
 
 #----------------------------------------------------------------------------
-def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10):
+def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEPR='rxr', SEPQ='qxq'):
     out_dir=out_dir+'/'
     try:  
         os.mkdir(out_dir)  
@@ -452,7 +452,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10):
     l1=fi.readline()
     l2=fi.readline()
     while l1 !='':
-        this_id=l1.rstrip().split('r')[5]
+        this_id=l1.rstrip().split(SEPR)[5]
         REF[this_id]=''
         l1=fi.readline()
         l2=fi.readline()
@@ -462,7 +462,8 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10):
     l1=fi.readline()
     l2=fi.readline()
     while l1 !='':
-        this_id=l1.rstrip().split('r')[5]
+        this_id=l1.rstrip().split(SEPR)[5]
+        print(this_id)
         REF[this_id]+=l1+l2
         l1=fi.readline()
         l2=fi.readline()
@@ -475,7 +476,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10):
     l1=fi.readline()
     l2=fi.readline()
     while l1 !='':
-        this_id=l1.rstrip().split('q')[5]
+        this_id=l1.rstrip().split(SEPQ)[5]
         QUERY[this_id]=''
         l1=fi.readline()
         l2=fi.readline()
@@ -486,7 +487,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10):
     l1=fi.readline()
     l2=fi.readline()
     while l1 !='':
-        this_id=l1.rstrip().split('q')[5]
+        this_id=l1.rstrip().split(SEPQ)[5]
         QUERY[this_id]+=l1+l2
         l1=fi.readline()
         l2=fi.readline()
@@ -579,9 +580,9 @@ filterSnv(bed_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/f3_snv_filte
 sortBed(bed_in_path=OUT_DIR+'/f3_snv_filtered.bed', bed_out_path=OUT_DIR+'/f4_snv_sorted.bed', bedtools_path=bedtools_path)
 dupletCluster(bed_in_path=OUT_DIR+'/f4_snv_sorted.bed', bed_out_path=OUT_DIR+'/f5_snv_duplet_site.bed', cluster_distance=CLUSTER_DISTANCE,cluster_size=2)
 getClusterBed(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', bed_out_path=OUT_DIR+'/f6_snv_duplet_cluster.bed')
-bed2addfa(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', ref_in_path=ref_in_path, fa_out_path=OUT_DIR+'/f7_snv_duplet_site.a20.fa', AROUND=SITE_ADD_AROUND, SEP='q')
-bed2flankfa(bed_in_path=OUT_DIR+'/f6_snv_duplet_cluster.bed', ref_in_path=ref_in_path, fa_out_path=OUT_DIR+'/f8_snv_duplet_cluster.f20000.fa', AROUND=CLUSTER_FLANK_AROUND, SEP='r')
-blatAlign(ref_in_path=OUT_DIR+'/f8_snv_duplet_cluster.f20000.fa', query_in_path=OUT_DIR+'/f7_snv_duplet_site.a20.fa', out_dir=OUT_DIR+'/f9_blat_out', blat_path=blat_path, CPU=CPU)
+bed2addfa(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', ref_in_path=ref_in_path, fa_out_path=OUT_DIR+'/f7_snv_duplet_site.a20.fa', AROUND=SITE_ADD_AROUND, SEP='qxq')
+bed2flankfa(bed_in_path=OUT_DIR+'/f6_snv_duplet_cluster.bed', ref_in_path=ref_in_path, fa_out_path=OUT_DIR+'/f8_snv_duplet_cluster.f20000.fa', AROUND=CLUSTER_FLANK_AROUND, SEP='rxr')
+blatAlign(ref_in_path=OUT_DIR+'/f8_snv_duplet_cluster.f20000.fa', query_in_path=OUT_DIR+'/f7_snv_duplet_site.a20.fa', out_dir=OUT_DIR+'/f9_blat_out', blat_path=blat_path, CPU=CPU, SEPR='rxr', SEPQ='qxq')
 
 
 
