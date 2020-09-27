@@ -14,5 +14,5 @@ Users can download binary files of bedtools and blat from: https://github.com/ju
 
 ### Usage
 
-<img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_role.png" width="80">
+<img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_role.png" width="100">
 
