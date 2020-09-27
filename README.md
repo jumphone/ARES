@@ -5,8 +5,11 @@
 # Requirements
 
 bedtools
+
 pysam
+
 blat
+
 python3
 
 
