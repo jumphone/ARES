@@ -38,8 +38,6 @@ CUT=10
 CLUSTER_DISTANCE=200
 SITE_ADD_AROUND=20
 CLUSTER_FLANK_AROUND=20000
-DP_UP=200
-DP_LW=1
 #----------------------------------------------------------------------------
 
 
@@ -787,7 +785,7 @@ def getBedDP(bed_in_path=0, bam_in_path=0, bed_out_path=0, bedtools_path=0):
 #----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
-def filterDP(bed_in_path=0, bed_out_path=0,UP=200,LW=1):
+def filterDP(bed_in_path=0, bed_out_path=0,UP=1000,LW=1):
     fi=open(bed_in_path)
     fo=open(bed_out_path,'w')
     for line in fi:
@@ -847,8 +845,6 @@ combineBed(bed_in_path_1=OUT_DIR+'/fc_res_dsrna.bed',bed_in_path_2=OUT_DIR+'/ff_
 #
 getBedAD(bed_in_path=OUT_DIR+'/fg_res_all.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fh_res_all_AD.bed')
 getBedDP(bed_in_path=OUT_DIR+'/fh_res_all_AD.bed', bam_in_path=bam_in_path, bed_out_path=OUT_DIR+'/fi_res_all_AD_DP.bed',bedtools_path=bedtools_path)
-filterDP(bed_in_path=OUT_DIR+'/fi_res_all_AD_DP.bed', bed_out_path=OUT_DIR+'/fj_res_all_AD_DP_filteredDP.bed', UP=DP_UP,LW=DP_LW)
-
 
 #----------------------------------------------------------------------------
 print('Finished !\n')
