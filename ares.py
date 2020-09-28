@@ -1,6 +1,7 @@
 #----------------------------------------------------------------------------
 # ARES
 # Annotation-free toolkit for identifying Rna Editing Sites
+# Web site: https://github.com/jumphone/ARES
 # Author: Feng Zhang
 # Date: 2020.9
 # Requirements:
@@ -11,7 +12,6 @@
 #     blat=v.36x7
 #----------------------------------------------------------------------------
 
-
 #----------------------------------------------------------------------------
 import re
 import os
@@ -21,8 +21,21 @@ import pysam
 import numpy as np
 import subprocess 
 from multiprocessing import Process, Queue
+#----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
+print('''
+    
+bam_in_path   =  sys.argv[1]
+ref_in_path   =  sys.argv[2]
+OUT_DIR       =  sys.argv[3]
+bedtools_path =  sys.argv[4]
+blat_path     =  sys.argv[5]
+anno_path     =  sys.argv[6]
+
+    ''')
+#----------------------------------------------------------------------------
+
 
 
 #----------------------------------------------------------------------------
@@ -31,14 +44,22 @@ ref_in_path   =  sys.argv[2]
 OUT_DIR       =  sys.argv[3]
 bedtools_path =  sys.argv[4]
 blat_path     =  sys.argv[5]
-anno_in_path  =  sys.argv[6]
+
+try:
+    anno_in_path  =  sys.argv[6]
+except ValueError:
+    anno_in_path  = 0 
+
+
 
 CPU=10
 CUT=10
 CLUSTER_DISTANCE=200
 SITE_ADD_AROUND=20
-CLUSTER_FLANK_AROUND=20000
+CLUSTER_ADD_AROUND=20000
 #----------------------------------------------------------------------------
+
+
 
 
 #----------------------------------------------------------------------------
@@ -81,7 +102,7 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
             if i == 'I' or i == 'D' or i== 'M' or i=='S' or i=='P' or i=='N' :
                 donee.append(i)
         return donee,lst
-	#donefunction
+    #donefunction
 
     def doneCG(CG,chrr,pos,seq,qseq):#pos is 1 base
         donee,lst=doCG(CG)
@@ -128,7 +149,7 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
         refseq=refseq.upper()
         seqseq=seqseq.upper()
         return refseq,seqseq,errorsite,intersite,quasite,locsite,pieceloc
-	#################################################################################		
+    #################################################################################       
     
     fi = pysam.AlignmentFile(bam_in_path, "rb") #bam
     fo=open(zz_out_path,'w') #zz
@@ -150,7 +171,7 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
                 quasite=quasite[1:]
                 locsite=locsite[1:]
                 pieceloc=pieceloc[1:]
-				
+                
                 if len(intersite[0:-1])==0:
                     intersite='*;'
                 if len(errorsite[0:-1])==0:
@@ -161,14 +182,14 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
                     locsite='*'
                 if len(pieceloc)==0:
                     pieceloc='*'
-				
+                
                 if len(bin(int(this_flag)))>=9 and bin(int(this_flag))[-7]=='1':
                     this_name=this_name+'_1'
                 elif len(bin(int(this_flag)))>=10 and bin(int(this_flag))[-8]=='1':
                     this_name=this_name+'_2'
                 this_out=this_chr+'\t'+this_flag+'\t'+this_mapq+'\t'+intersite[0:-1]+'\t'+errorsite[0:-1]+'\t'+quasite+'\t'+locsite+'\t'+this_seq+'\t'+this_name+'\t'+pieceloc+'\n'
                 if errorsite !='*;':
-                    fo.write(this_out)	
+                    fo.write(this_out)  
     fo.close()
 #----------------------------------------------------------------------------
 
@@ -372,38 +393,7 @@ def getClusterBed(bed_in_path=0, bed_out_path=0):
 
 
 #----------------------------------------------------------------------------
-def bed2flankfa(bed_in_path=0, ref_in_path=0, fa_out_path=0, AROUND=0, SEP='r'):
-
-    #-----------------------------------------------------------
-    #Load refgenome
-    chrom=loadRef(fa_in_path=ref_in_path)
-    #------------------------------------------------------------
-    fi=open(bed_in_path)
-    fo=open(fa_out_path,'w')
-    for line in fi:
-        seq=line.rstrip().split('\t')
-        this_tag=SEP.join(seq)
-        this_chr=seq[0]
-        this_start=int(seq[1])
-        this_end=int(seq[2])
-
-        this_add_start=max([this_start-AROUND,0])
-        this_add_end=this_end+AROUND
-
-        this_seq_before = chrom[this_chr][this_add_start:this_start].upper()
-        this_seq_after = chrom[this_chr][this_end:this_add_end].upper()
-
-        fo.write('>'+this_tag+SEP+'BEFORE\n')
-        fo.write(this_seq_before+'\n')
-        fo.write('>'+this_tag+SEP+'AFTER\n')
-        fo.write(this_seq_after+'\n')
-
-    fo.close()
-#----------------------------------------------------------------------------
-
-
-#----------------------------------------------------------------------------
-def bed2addfa(bed_in_path=0, ref_in_path=0, fa_out_path=0, AROUND=0, SEP='q'):
+def bed2addfa(bed_in_path=0, ref_in_path=0, fa_out_path=0, AROUND=0, SEP='x'):
     #-----------------------------------------------------------
     #Load refgenome
     chrom=loadRef(fa_in_path=ref_in_path)
@@ -416,11 +406,14 @@ def bed2addfa(bed_in_path=0, ref_in_path=0, fa_out_path=0, AROUND=0, SEP='q'):
         this_chr=seq[0]
         this_start=int(seq[1])
         this_end=int(seq[2])
-        this_tag=SEP.join(seq)
-
+        
 
         this_add_start=max([this_start-AROUND,0])
         this_add_end=this_end+AROUND
+
+        this_tag=SEP.join(seq)+SEP+str(AROUND)+SEP+this_chr+SEP+str(this_add_start)+SEP+str(this_add_end)
+
+
  
         this_seq = chrom[this_chr][this_add_start:this_add_end].upper()
         fo.write('>'+this_tag+'\n')
@@ -438,7 +431,7 @@ def blatWorker(q, ARG):
     blat_path=ARG[3]
 
     this_step =subprocess.Popen(' '.join([blat_path,'-out=blast9','-minScore=25','-minIdentity=70', '-fastMap', ref_in_path, query_in_path, 
-	                                   map_out_path+'.tmpOut', '>', map_out_path+'.tmpInfo' ]),shell=True)
+                                       map_out_path+'.tmpOut', '>', map_out_path+'.tmpInfo' ]),shell=True)
     this_step.wait()
     fmap=open(map_out_path,'a')
     ftmp=open(map_out_path+'.tmpOut')
@@ -565,7 +558,7 @@ def statBlatResult(blast9_in_dir=0, bed_in_path=0, bed_out_path=0,SEP='qxq'):
     fi=open(blast9_in_path)
     for line in fi:
         seq=line.rstrip().split('\t')
-        this_snv=seq[0].replace(SEP,'\t')
+        this_snv='\t'.join(seq[0].split(SEP)[0:6])
         SNV[this_snv]=[0,0]
     fi.close()
 
@@ -573,7 +566,7 @@ def statBlatResult(blast9_in_dir=0, bed_in_path=0, bed_out_path=0,SEP='qxq'):
     fi=open(blast9_in_path)
     for line in fi:
         seq=line.rstrip().split('\t')
-        this_snv=seq[0].replace(SEP,'\t')
+        this_snv='\t'.join(seq[0].split(SEP)[0:6])
         if int(seq[9])  > int(seq[8]):
             SNV[this_snv][0]+=1
         else:
@@ -646,39 +639,23 @@ def filterDsrna(bed_in_path=0, bed_out_path=0):
         seq=line.rstrip().split('\t')
         this_id=seq[5]
         this_num=int(seq[4])
-        this_fw=int(seq[6])
+        this_fw=max([int(seq[6]) -1, 0]) # Remove self-alignment
         this_rv=int(seq[7])
         this_ad=int(seq[8])
 
-        this_flag=0
-
-        if this_num >=7:
-            this_flag=1
-
-        if this_ad >=1 and this_num>=3 and this_rv >=1:
-            this_flag=1
-
-        if this_ad >=2 and this_num>=2 and this_rv >=1:
-            if this_id in AD2_CLUSTER:
-                AD2_CLUSTER[this_id]+=1
-            else:
-                AD2_CLUSTER[this_id]=1
-
-        if this_fw>=10 or this_rv >=10:
-            this_flag=0
+        if this_num>=3 and this_rv > 0:
+            CLST_SET.add(this_id)
+        
+        if this_num>=2 and this_rv > this_fw:
+            CLST_SET.add(this_id)
+        
+        if this_fw >=10 and this_rv >=10:
             CLST_DEL.add(this_id)
-        #if this_rv >0:
-        #if this_fw <= 10 and this_rv <=10 and (this_rv >0 or  this_num >= 7): 
-        if this_flag==1:
-            CLST_SET.add(this_id)
 
-    for this_id in AD2_CLUSTER:
-        if AD2_CLUSTER[this_id]>=2:
-            CLST_SET.add(this_id)
 
     CLST_SELECT=set()
     for this_id in CLST_SET:
-    	if this_id not in CLST_DEL:
+        if this_id not in CLST_DEL:
             CLST_SELECT.add(this_id)
 
     PRINTED=set()
@@ -698,7 +675,7 @@ def filterDsrna(bed_in_path=0, bed_out_path=0):
 def bedAnno(bed_in_path=0, anno_in_path=0, bed_out_path=0, bedtools_path=0):
 
     this_step =subprocess.Popen(' '.join([bedtools_path,'intersect','-loj -wa -wb','-a',bed_in_path, '-b',anno_in_path, 
-	                                      '>', bed_out_path ]),shell=True)
+                                          '>', bed_out_path ]),shell=True)
     this_step.wait()
 #----------------------------------------------------------------------------
 
@@ -720,16 +697,15 @@ def filterAnno(bed_in_path=0, bed_out_path=0):
         this_num=int(seq[4])
         this_ad=int(seq[6])
 
-        this_flag=0
 
         if this_num >=7:
-            this_flag=1
+            CLST_SET.add(this_id)
         
         if this_ad >=1 and this_num>=5 and 'Repeat_region' in line:
-            this_flag=1
+            CLST_SET.add(this_id)
 
         if this_ad >=1 and this_num>=3 and 'Alu' in line:
-            this_flag=1
+            CLST_SET.add(this_id)
 
         if this_ad >=2 and this_num>=2 and 'Alu' in line:
             if this_id in AD2_CLUSTER:
@@ -738,12 +714,8 @@ def filterAnno(bed_in_path=0, bed_out_path=0):
                 AD2_CLUSTER[this_id]=1
 
         if 'Simple_repeat' in line or 'Low_complexity' in line:
-            this_flag=0
             CLST_DEL.add(this_id)
        
-
-        if this_flag==1:
-            CLST_SET.add(this_id)
 
     for this_id in AD2_CLUSTER:
         if AD2_CLUSTER[this_id]>=2:
@@ -751,7 +723,7 @@ def filterAnno(bed_in_path=0, bed_out_path=0):
 
     CLST_SELECT=set()
     for this_id in CLST_SET:
-    	if this_id not in CLST_DEL:
+        if this_id not in CLST_DEL:
             CLST_SELECT.add(this_id)
     
 
@@ -797,20 +769,114 @@ def filterDP(bed_in_path=0, bed_out_path=0,UP=1000,LW=1):
 #----------------------------------------------------------------------------
 
 
-print('''
+#----------------------------------------------------------------------------
+def summaryRES(bed_in_path=0, txt_out_path=0):
+    TYPE=['AC','AG','AT','CA','CG','CT','GA','GC','GT','TA','TC','TG']
+    NUM=[0,0,0,0,0,0,0,0,0,0,0,0]
     
-bam_in_path   =  sys.argv[1]
-ref_in_path   =  sys.argv[2]
-OUT_DIR       =  sys.argv[3]
-bedtools_path =  sys.argv[4]
-blat_path     =  sys.argv[5]
-anno_path     =  sys.argv[6]
+    fi=open(bed_in_path)
+    fo=open(txt_out_path,'w')
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_type=seq[3]
+        NUM[TYPE.index(this_type)]+=1
+    
+    SUM=sum(NUM)
+    header='#type\tnumber\tpercentage\n'
+    i=0
+    while i <len(TYPE):
+        this_type=TYPE[i]
+        this_num=str(NUM[i])
+        this_ratio=str(round(float(NUM[i])/float(SUM)*100,2))
+        fo.write(this_type+'\t'+this_num+'\t'+this_ratio+'\n')
+        i=i+1
 
-	''')
+    #####################
+    this_type='AG+TC'
+    this_num =str(NUM[TYPE.index('AG')]+NUM[TYPE.index('TC')])
+    this_ratio=str(round(float(this_num)/float(SUM)*100 ,2))
+    fo.write(this_type+'\t'+this_num+'\t'+this_ratio+'\n')
+    ###################
+    
+    #####################
+    this_type='Total'
+    this_num =str(SUM)
+    this_ratio=str(round(float(this_num)/float(SUM)*100 ,2))
+    fo.write(this_type+'\t'+this_num+'\t'+this_ratio+'\n')
+    ###################
+   
+    fo.close()
+#----------------------------------------------------------------------------
+
+
+
+#----------------------------------------------------------------------------
+def getInvertedRegion(blastall_in_path=0, resall_in_path=0, inverted_out_path=0, SEPQ='qxq', SEPR='rxr', AROUND=20000 ):
+    f_blast=open(blastall_in_path)
+    f_resall=open(resall_in_path)
+    fo=open(inverted_out_path,'w')
+
+    CLST_SET=set()
+    for line in f_resall:
+        seq=line.rstrip().split('\t')
+        this_id=seq[5]
+        CLST_SET.add(this_id)
+
+    for line in f_blast:
+        seq=line.rstrip().split('\t')
+        
+        q_seq=seq[0].rstrip().split(SEPQ)
+        q_chr=q_seq[0]
+        q_start=int(q_seq[1])+1
+        q_end=int(q_seq[2])
+        q_type=q_seq[3]
+        q_num=q_seq[4]
+        q_id=q_seq[5]
+
+        r_seq=seq[1].rstrip().split(SEPR)
+        r_tag=r_seq[6]
+
+        q_pos=[int(seq[6]),int(seq[7])]
+        r_pos=[int(seq[8]),int(seq[9])]
+        
+        if r_tag == 'AFTER':
+            1+1
+
+    
+    fo.close()
+#----------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------
+def getTandemRegion(blastall_in_path=0, resall_in_path=0, tandem_out_path=0, SEPQ='qxq', SEPR='rxr', AROUND=20000 ):
+    f_blast=open(blastall_in_path)
+    f_resall=open(resall_in_path)
+    fo=open(tandem_out_path,'w')
+
+    CLST_SET=set()
+    for line in f_resall:
+        seq=line.rstrip().split('\t')
+        this_id=seq[5]
+        CLST_SET.add(this_id)
+
+    for line in f_blast:
+        seq=line.rstrip().split('\t')
+     
+        
+    
+    fo.close()
+#----------------------------------------------------------------------------
 
 
 
 
+
+
+
+#----------------------------------------------------------------------------
+##########################################
+##########################################
+##########################################
 
 OUT_DIR=OUT_DIR+'/'
 try:  
@@ -819,35 +885,79 @@ except OSError as error:
     print(error)
 
 
+########################
+# BAM -> ZZ -> SNV -> DUPLET
+########################
 bam2zz(bam_in_path=bam_in_path, fa_in_path=ref_in_path, zz_out_path=OUT_DIR+'/f1_read.zz')
 zz2snv(zz_in_path=OUT_DIR+'/f1_read.zz', bed_out_path=OUT_DIR+'/f2_snv.bed')
 filterSnv(bed_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/f3_snv_filtered.bed', CUT=CUT)
 sortBed(bed_in_path=OUT_DIR+'/f3_snv_filtered.bed', bed_out_path=OUT_DIR+'/f4_snv_sorted.bed', bedtools_path=bedtools_path)
 dupletCluster(bed_in_path=OUT_DIR+'/f4_snv_sorted.bed', bed_out_path=OUT_DIR+'/f5_snv_duplet_site.bed', cluster_distance=CLUSTER_DISTANCE,cluster_size=2)
 
+
+########################
 # dsRNA-based
+########################
 getClusterBed(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', bed_out_path=OUT_DIR+'/f6_snv_duplet_cluster.bed')
 bed2addfa(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', ref_in_path=ref_in_path, fa_out_path=OUT_DIR+'/f7_snv_duplet_site.a20.fa', AROUND=SITE_ADD_AROUND, SEP='qxq')
-bed2flankfa(bed_in_path=OUT_DIR+'/f6_snv_duplet_cluster.bed', ref_in_path=ref_in_path, fa_out_path=OUT_DIR+'/f8_snv_duplet_cluster.f20000.fa', AROUND=CLUSTER_FLANK_AROUND, SEP='rxr')
-blatAlign(ref_in_path=OUT_DIR+'/f8_snv_duplet_cluster.f20000.fa', query_in_path=OUT_DIR+'/f7_snv_duplet_site.a20.fa', out_dir=OUT_DIR+'/f9_blat_out', blat_path=blat_path, CPU=CPU, SEPR='rxr', SEPQ='qxq')
+bed2addfa(bed_in_path=OUT_DIR+'/f6_snv_duplet_cluster.bed', ref_in_path=ref_in_path, fa_out_path=OUT_DIR+'/f8_snv_duplet_cluster.a20000.fa', AROUND=CLUSTER_ADD_AROUND, SEP='rxr')
+blatAlign(ref_in_path=OUT_DIR+'/f8_snv_duplet_cluster.a20000.fa', query_in_path=OUT_DIR+'/f7_snv_duplet_site.a20.fa', out_dir=OUT_DIR+'/f9_blat_out', blat_path=blat_path, CPU=CPU, SEPR='rxr', SEPQ='qxq')
 statBlatResult(blast9_in_dir=OUT_DIR+'/f9_blat_out', bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', bed_out_path=OUT_DIR+'/fa_snv_duplet_blat_stats.bed', SEP='qxq')
 getBedAD(bed_in_path=OUT_DIR+'/fa_snv_duplet_blat_stats.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fb_snv_duplet_blat_stats_AD.bed')
 filterDsrna(bed_in_path=OUT_DIR+'/fb_snv_duplet_blat_stats_AD.bed', bed_out_path=OUT_DIR+'/fc_res_dsrna.bed')
 
-#Anno-based
-getBedAD(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed')
-bedAnno(bed_in_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed', anno_in_path=anno_in_path, bed_out_path=OUT_DIR+'/fe_snv_duplet_site_AD_anno.bed', bedtools_path=bedtools_path)
-filterAnno(bed_in_path=OUT_DIR+'/fe_snv_duplet_site_AD_anno.bed', bed_out_path=OUT_DIR+'/ff_res_anno.bed')
 
-#Combine dsRNA RES and Anno RES
+########################
+# Annotation-based
+########################
+getBedAD(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed')
+try:
+    bedAnno(bed_in_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed', anno_in_path=anno_in_path, bed_out_path=OUT_DIR+'/fe_snv_duplet_site_AD_anno.bed', bedtools_path=bedtools_path)
+    filterAnno(bed_in_path=OUT_DIR+'/fe_snv_duplet_site_AD_anno.bed', bed_out_path=OUT_DIR+'/ff_res_anno.bed')
+except ValueError:
+    filterAnno(bed_in_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed', bed_out_path=OUT_DIR+'/ff_res_anno.bed')
+
+
+########################
+# Combine dsRNA & Anno
+########################
 combineBed(bed_in_path_1=OUT_DIR+'/fc_res_dsrna.bed',bed_in_path_2=OUT_DIR+'/ff_res_anno.bed',bed_out_path=OUT_DIR+'/fg_res_all.bed', bedtools_path=bedtools_path)
 
-#
+
+########################
+# Summarize Result & Others
+########################
+summaryRES(bed_in_path=OUT_DIR+'/fc_res_dsrna.bed', txt_out_path=OUT_DIR+'/fc_res_dsrna.bed.summary.txt')
+summaryRES(bed_in_path=OUT_DIR+'/ff_res_anno.bed', txt_out_path=OUT_DIR+'/ff_res_anno.bed.summary.txt')
+summaryRES(bed_in_path=OUT_DIR+'/fg_res_all.bed', txt_out_path=OUT_DIR+'/fg_res_all.bed.summary.txt')
 getBedAD(bed_in_path=OUT_DIR+'/fg_res_all.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fh_res_all_AD.bed')
 getBedDP(bed_in_path=OUT_DIR+'/fh_res_all_AD.bed', bam_in_path=bam_in_path, bed_out_path=OUT_DIR+'/fi_res_all_AD_DP.bed',bedtools_path=bedtools_path)
 
 #----------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+#----------------------------------------------------------------------------
 print('Finished !\n')
 print (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+
+
+
+
+
+
+##################################
+# https://github.com/jumphone/ARES
+# Thanks for using ARES !!!
+##################################
+
+
 
 
