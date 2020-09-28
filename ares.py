@@ -31,7 +31,7 @@ ref_in_path   =  sys.argv[2]
 OUT_DIR       =  sys.argv[3]
 bedtools_path =  sys.argv[4]
 blat_path     =  sys.argv[5]
-anno_path     =  sys.argv[6]
+anno_in_path  =  sys.argv[6]
 
 CPU=10
 CUT=10
