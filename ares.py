@@ -11,6 +11,7 @@
 #     blat=v.36x7
 #----------------------------------------------------------------------------
 
+
 #----------------------------------------------------------------------------
 import re
 import os
@@ -21,6 +22,24 @@ import numpy as np
 import subprocess 
 from multiprocessing import Process, Queue
 
+#----------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------
+bam_in_path   =  sys.argv[1]
+ref_in_path   =  sys.argv[2]
+OUT_DIR       =  sys.argv[3]
+bedtools_path =  sys.argv[4]
+blat_path     =  sys.argv[5]
+anno_path     =  sys.argv[6]
+
+CPU=10
+CUT=10
+CLUSTER_DISTANCE=200
+SITE_ADD_AROUND=20
+CLUSTER_FLANK_AROUND=20000
+DP_UP=200
+DP_LW=1
 #----------------------------------------------------------------------------
 
 
@@ -535,14 +554,250 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
 #----------------------------------------------------------------------------
 
 
+#----------------------------------------------------------------------------
+def statBlatResult(blast9_in_dir=0, bed_in_path=0, bed_out_path=0,SEP='qxq'):
 
-#PATH='/home/Lilab/Docker/zhangfeng/database/RNAseq/U87MG_ADAR/hisat2/SRR388226.ADAR.CTRL.airOut/'
+    this_step =subprocess.Popen(' '.join(['cat',blast9_in_dir+'/*.blast9','>', bed_out_path+'.blast9All']),shell=True)
+    this_step.wait()
 
-#blatAlign(ref_in_path=PATH+'/f4_SNV_sorted_duplet.bed.c.bed.20000.fa', 
-#     query_in_path=PATH+'/f4_SNV_sorted_duplet.bed.fa', 
-#     out_dir='/home/Lilab/Docker/zhangfeng/database/RNAseq/U87MG_ADAR/hisat2/ARES/TMP_OUT', 
-#     blat_path='/usr/local/bin/blat', 
-#     CPU=10)
+    blast9_in_path=bed_out_path+'.blast9All'
+    
+    SNV={}
+
+    fi=open(blast9_in_path)
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_snv=seq[0].replace(SEP,'\t')
+        SNV[this_snv]=[0,0]
+    fi.close()
+
+
+    fi=open(blast9_in_path)
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_snv=seq[0].replace(SEP,'\t')
+        if int(seq[9])  > int(seq[8]):
+            SNV[this_snv][0]+=1
+        else:
+            SNV[this_snv][1]+=1
+    fi.close()
+
+    fi=open(bed_in_path)
+    fo=open(bed_out_path,'w')
+    for line in fi:
+        #seq=line.rstrip().split('\t')
+        this_snv=line.rstrip()#seq[0]+'\t'+seq[1]+'\t'+seq[2]+'\t'+seq[6]+'\t'+seq[3]+'\t'+seq[4]
+        if this_snv in SNV:
+            out=[this_snv,str(SNV[this_snv][0]),str(SNV[this_snv][1])]
+        else:
+            out=[this_snv, '0','0']
+        fo.write('\t'.join(out)+'\n')
+    fi.close()
+    fo.close()
+#----------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------
+def getBedAD(bed_in_path=0, allsnv_in_path=0, bed_out_path=0):
+
+    AD={}
+
+    fi=open(allsnv_in_path)
+    header=fi.readline()
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_snv=':'.join([seq[0],seq[2],seq[3]])
+        #print(this_snv)
+        AD[this_snv]=0
+    fi.close()
+
+    fi=open(allsnv_in_path)
+    header=fi.readline()
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_snv=':'.join([seq[0],seq[2],seq[3]])
+        AD[this_snv]=AD[this_snv]+1
+        #print(AD[this_snv])
+    fi.close()
+
+
+    fi=open(bed_in_path)
+    fo=open(bed_out_path,'w')
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_snv=':'.join([seq[0],seq[2],seq[3]])
+        this_ad=str(AD[this_snv])
+        #if int(this_ad)>1:
+        #    print(AD[this_snv])
+        fo.write(line.rstrip()+'\t'+this_ad+'\n')
+    fo.close()
+#----------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------
+def filterDsrna(bed_in_path=0, bed_out_path=0):
+
+    fi=open(bed_in_path)
+    fo=open(bed_out_path,'w')
+
+    CLST_SET=set()
+    CLST_DEL=set()
+    
+    AD2_CLUSTER={}
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_id=seq[5]
+        this_num=int(seq[4])
+        this_fw=int(seq[6])
+        this_rv=int(seq[7])
+        this_ad=int(seq[8])
+
+        this_flag=0
+
+        if this_num >=7:
+            this_flag=1
+
+        if this_ad >=1 and this_num>=3 and this_rv >=1:
+            this_flag=1
+
+        if this_ad >=2 and this_num>=2 and this_rv >=1:
+            if this_id in AD2_CLUSTER:
+                AD2_CLUSTER[this_id]+=1
+            else:
+                AD2_CLUSTER[this_id]=1
+
+        if this_fw>=10 or this_rv >=10:
+            this_flag=0
+            CLST_DEL.add(this_id)
+        #if this_rv >0:
+        #if this_fw <= 10 and this_rv <=10 and (this_rv >0 or  this_num >= 7): 
+        if this_flag==1:
+            CLST_SET.add(this_id)
+
+    for this_id in AD2_CLUSTER:
+        if AD2_CLUSTER[this_id]>=2:
+            CLST_SET.add(this_id)
+
+    CLST_SELECT=set()
+    for this_id in CLST_SET:
+    	if this_id not in CLST_DEL:
+            CLST_SELECT.add(this_id)
+
+    PRINTED=set()
+    fi=open(bed_in_path)
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_id=seq[5]
+        if this_id in CLST_SELECT:
+            if seq[0]+':'+seq[2]+':'+seq[3] not in PRINTED:
+                PRINTED.add(seq[0]+':'+seq[2]+':'+seq[3])
+                fo.write(line)
+    fo.close()
+#----------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------
+def bedAnno(bed_in_path=0, anno_in_path=0, bed_out_path=0, bedtools_path=0):
+
+    this_step =subprocess.Popen(' '.join([bedtools_path,'intersect','-loj -wa -wb','-a',bed_in_path, '-b',anno_in_path, 
+	                                      '>', bed_out_path ]),shell=True)
+    this_step.wait()
+#----------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------
+def filterAnno(bed_in_path=0, bed_out_path=0):
+
+    fi=open(bed_in_path)
+    fo=open(bed_out_path,'w')
+
+    CLST_SET=set()
+    CLST_DEL=set()
+
+    AD2_CLUSTER={}
+
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_id=seq[5]
+        this_num=int(seq[4])
+        this_ad=int(seq[6])
+
+        this_flag=0
+
+        if this_num >=7:
+            this_flag=1
+        
+        if this_ad >=1 and this_num>=5 and 'Repeat_region' in line:
+            this_flag=1
+
+        if this_ad >=1 and this_num>=3 and 'Alu' in line:
+            this_flag=1
+
+        if this_ad >=2 and this_num>=2 and 'Alu' in line:
+            if this_id in AD2_CLUSTER:
+                AD2_CLUSTER[this_id]+=1
+            else:
+                AD2_CLUSTER[this_id]=1
+
+        if 'Simple_repeat' in line or 'Low_complexity' in line:
+            this_flag=0
+            CLST_DEL.add(this_id)
+       
+
+        if this_flag==1:
+            CLST_SET.add(this_id)
+
+    for this_id in AD2_CLUSTER:
+        if AD2_CLUSTER[this_id]>=2:
+            CLST_SET.add(this_id)
+
+    CLST_SELECT=set()
+    for this_id in CLST_SET:
+    	if this_id not in CLST_DEL:
+            CLST_SELECT.add(this_id)
+    
+
+    fi=open(bed_in_path)
+    PRINTED=set()
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_id=seq[5]
+        if this_id in CLST_SELECT:
+            if seq[0]+':'+seq[2]+':'+seq[3] not in PRINTED:
+                PRINTED.add(seq[0]+':'+seq[2]+':'+seq[3])
+                fo.write(line)    
+    fo.close()
+#----------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------
+def combineBed(bed_in_path_1=0,bed_in_path_2=0,bed_out_path=0, bedtools_path=0):
+
+    this_step =subprocess.Popen(' '.join(['cat', bed_in_path_1, bed_in_path_2, '|','cut -f 1,2,3,4,5,6 -','|','sort -','|','uniq -','|',bedtools_path,'sort -i -',
+                                          '>', bed_out_path ]),shell=True)
+    this_step.wait()
+#----------------------------------------------------------------------------
+
+
+#----------------------------------------------------------------------------
+def getBedDP(bed_in_path=0, bam_in_path=0, bed_out_path=0, bedtools_path=0):
+
+    this_step =subprocess.Popen(' '.join([bedtools_path,'multicov','-bams',bam_in_path,'-bed',bed_in_path,'>',bed_out_path]),shell=True)
+    this_step.wait()
+#----------------------------------------------------------------------------
+
+#----------------------------------------------------------------------------
+def filterDP(bed_in_path=0, bed_out_path=0,UP=200,LW=1):
+    fi=open(bed_in_path)
+    fo=open(bed_out_path,'w')
+    for line in fi:
+        seq=line.rstrip().split('\t')
+        this_dp=int(seq[-1])
+        if this_dp <=UP and this_dp >=LW:
+            fo.write(line)
+    fo.close()
+#----------------------------------------------------------------------------
+
 
 print('''
     
@@ -551,21 +806,13 @@ ref_in_path   =  sys.argv[2]
 OUT_DIR       =  sys.argv[3]
 bedtools_path =  sys.argv[4]
 blat_path     =  sys.argv[5]
+anno_path     =  sys.argv[6]
 
 	''')
 
 
-bam_in_path   =  sys.argv[1]
-ref_in_path   =  sys.argv[2]
-OUT_DIR       =  sys.argv[3]
-bedtools_path =  sys.argv[4]
-blat_path     =  sys.argv[5]
 
-CPU=10
-CUT=10
-CLUSTER_DISTANCE=200
-SITE_ADD_AROUND=20
-CLUSTER_FLANK_AROUND=20000
+
 
 OUT_DIR=OUT_DIR+'/'
 try:  
@@ -579,11 +826,28 @@ zz2snv(zz_in_path=OUT_DIR+'/f1_read.zz', bed_out_path=OUT_DIR+'/f2_snv.bed')
 filterSnv(bed_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/f3_snv_filtered.bed', CUT=CUT)
 sortBed(bed_in_path=OUT_DIR+'/f3_snv_filtered.bed', bed_out_path=OUT_DIR+'/f4_snv_sorted.bed', bedtools_path=bedtools_path)
 dupletCluster(bed_in_path=OUT_DIR+'/f4_snv_sorted.bed', bed_out_path=OUT_DIR+'/f5_snv_duplet_site.bed', cluster_distance=CLUSTER_DISTANCE,cluster_size=2)
+
+# dsRNA-based
 getClusterBed(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', bed_out_path=OUT_DIR+'/f6_snv_duplet_cluster.bed')
 bed2addfa(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', ref_in_path=ref_in_path, fa_out_path=OUT_DIR+'/f7_snv_duplet_site.a20.fa', AROUND=SITE_ADD_AROUND, SEP='qxq')
 bed2flankfa(bed_in_path=OUT_DIR+'/f6_snv_duplet_cluster.bed', ref_in_path=ref_in_path, fa_out_path=OUT_DIR+'/f8_snv_duplet_cluster.f20000.fa', AROUND=CLUSTER_FLANK_AROUND, SEP='rxr')
 blatAlign(ref_in_path=OUT_DIR+'/f8_snv_duplet_cluster.f20000.fa', query_in_path=OUT_DIR+'/f7_snv_duplet_site.a20.fa', out_dir=OUT_DIR+'/f9_blat_out', blat_path=blat_path, CPU=CPU, SEPR='rxr', SEPQ='qxq')
+statBlatResult(blast9_in_dir=OUT_DIR+'/f9_blat_out', bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', bed_out_path=OUT_DIR+'/fa_snv_duplet_blat_stats.bed', SEP='qxq')
+getBedAD(bed_in_path=OUT_DIR+'/fa_snv_duplet_blat_stats.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fb_snv_duplet_blat_stats_AD.bed')
+filterDsrna(bed_in_path=OUT_DIR+'/fb_snv_duplet_blat_stats_AD.bed', bed_out_path=OUT_DIR+'/fc_res_dsrna.bed')
 
+#Anno-based
+getBedAD(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed')
+bedAnno(bed_in_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed', anno_in_path=anno_in_path, bed_out_path=OUT_DIR+'/fe_snv_duplet_site_AD_anno.bed', bedtools_path=bedtools_path)
+filterAnno(bed_in_path=OUT_DIR+'/fe_snv_duplet_site_AD_anno.bed', bed_out_path=OUT_DIR+'/ff_res_anno.bed')
+
+#Combine dsRNA RES and Anno RES
+combineBed(bed_in_path_1=OUT_DIR+'/fc_res_dsrna.bed',bed_in_path_2=OUT_DIR+'/ff_res_anno.bed',bed_out_path=OUT_DIR+'/fg_res_all.bed', bedtools_path=bedtools_path)
+
+#
+getBedAD(bed_in_path=OUT_DIR+'/fg_res_all.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fh_res_all_AD.bed')
+getBedDP(bed_in_path=OUT_DIR+'/fh_res_all_AD.bed', bam_in_path=bam_in_path, bed_out_path=OUT_DIR+'/fi_res_all_AD_DP.bed',bedtools_path=bedtools_path)
+filterDP(bed_in_path=OUT_DIR+'/fi_res_all_AD_DP.bed', bed_out_path=OUT_DIR+'/fj_res_all_AD_DP_filteredDP.bed', UP=DP_UP,LW=DP_LW)
 
 
 #----------------------------------------------------------------------------
