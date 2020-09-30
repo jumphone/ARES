@@ -21,6 +21,8 @@ import pysam
 import numpy as np
 import subprocess 
 from multiprocessing import Process, Queue
+import random
+
 #----------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------
@@ -57,14 +59,19 @@ CUT=10
 CLUSTER_DISTANCE=200
 SITE_ADD_AROUND=20
 CLUSTER_ADD_AROUND=20000
+RUN_ID=str(random.random())
 #----------------------------------------------------------------------------
 
 
 
 
 #----------------------------------------------------------------------------
+print('#------ARES------\n')
 print('Started !\n')
-print (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+print( str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))+'\n')
+print('Run_ID=\n')
+print(RUN_ID+'\n')
+print('#----------------\n')
 #----------------------------------------------------------------------------
 
 
@@ -375,11 +382,12 @@ def getClusterBed(bed_in_path=0, bed_out_path=0):
         CLST_TYPE[this_id].append(this_type)
         CLST_NUM[this_id].append(this_num)
     
-        if i % 1000==1:
-            print(i)
+        #if i % 1000==1:
+        #    print(i)
         i=i+1
 
-
+    print(i)
+    
     for this_id in CLST_LIST:
         this_start=str(min(CLST_POS[this_id]))
         this_end  =str(max(CLST_POS[this_id]))
@@ -430,7 +438,7 @@ def blatWorker(q, ARG):
     map_out_path=ARG[2]
     blat_path=ARG[3]
 
-    this_step =subprocess.Popen(' '.join([blat_path,'-out=blast9','-minScore=25','-minIdentity=70', '-fastMap', ref_in_path, query_in_path, 
+    this_step =subprocess.Popen(' '.join([blat_path,'-out=blast9','-minScore=25','-minIdentity=70', '-fastMap', '-noHead', ref_in_path, query_in_path, 
                                        map_out_path+'.tmpOut', '>', map_out_path+'.tmpInfo' ]),shell=True)
     this_step.wait()
     fmap=open(map_out_path,'a')
@@ -455,6 +463,15 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
         print(error)
 
     count_out_path=out_dir+'/finished_count.txt'
+    
+    start_i=0
+    try:
+        start_i=int(open(count_out_path).read().rstrip().split('\n')[-1])
+    except OSError as error:
+        #print(error)
+        start_i=0
+
+
 
     ##########################
     REF={}
@@ -508,37 +525,37 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
     queue = Queue()
     i=0
     for this_id in QUERY:
+        if i>=start_i:
+            this_id=this_id
 
-        this_id=this_id
+            this_ref=REF[this_id]
+            this_query=QUERY[this_id]
 
-        this_ref=REF[this_id]
-        this_query=QUERY[this_id]
+            ##################################
+            this_job_id     =str(len(JOBS))
+            this_ref_path   =out_dir+'/r.'+this_job_id+'.fa'
+            this_query_path =out_dir+'/q.'+this_job_id+'.fa'
+            this_out_path   =out_dir+'/o.'+this_job_id+'.blast9'
 
-        ##################################
-        this_job_id     =str(len(JOBS))
-        this_ref_path   =out_dir+'/r.'+this_job_id+'.fa'
-        this_query_path =out_dir+'/q.'+this_job_id+'.fa'
-        this_out_path   =out_dir+'/o.'+this_job_id+'.blast9'
+            open(this_ref_path,  'w').write(this_ref)
+            open(this_query_path,'w').write(this_query)
 
-        open(this_ref_path,  'w').write(this_ref)
-        open(this_query_path,'w').write(this_query)
-        if i % 100 ==1:
-            open(count_out_path,'a').write(str(i)+'\n')
+            ##################
+            #blatWorker(ref_in_path=0, query_in_path=0, map_out_path=0, blat_path=0)
+            p=Process(target=blatWorker, args=(queue, [this_ref_path, this_query_path, this_out_path, blat_path] ))
+            p.start()
+            #this_job =subprocess.Popen(' '.join(['python3',BLAT_WORKER, this_ref_path, this_query_path, this_out_path]),shell=True)
+            JOBS.append(p)
+            ##################################
+            if len(JOBS)>=CPU:
+                for this_job in JOBS:
+                    this_job.join()
+                JOBS=[]
+            ##################################
+            ##################################
+            if i % 100 ==1:
+                open(count_out_path,'a').write(str(i)+'\n')
         i=i+1
-
-        ##################
-        #blatWorker(ref_in_path=0, query_in_path=0, map_out_path=0, blat_path=0)
-        p=Process(target=blatWorker, args=(queue, [this_ref_path, this_query_path, this_out_path, blat_path] ))
-        p.start()
-        #this_job =subprocess.Popen(' '.join(['python3',BLAT_WORKER, this_ref_path, this_query_path, this_out_path]),shell=True)
-        JOBS.append(p)
-        ##################################
-        if len(JOBS)>=CPU:
-            for this_job in JOBS:
-                this_job.join()
-            JOBS=[]
-        ##################################
-        ##################################
 
     for this_job in JOBS:
         this_job.join()
@@ -548,7 +565,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
 #----------------------------------------------------------------------------
 def statBlatResult(blast9_in_dir=0, bed_in_path=0, bed_out_path=0,SEP='qxq'):
 
-    this_step =subprocess.Popen(' '.join(['cat',blast9_in_dir+'/*.blast9','>', bed_out_path+'.blast9All']),shell=True)
+    this_step =subprocess.Popen(' '.join(['cat',blast9_in_dir+'/*.blast9','|','sort','|','uniq','>', bed_out_path+'.blast9All']),shell=True)
     this_step.wait()
 
     blast9_in_path=bed_out_path+'.blast9All'
@@ -558,19 +575,31 @@ def statBlatResult(blast9_in_dir=0, bed_in_path=0, bed_out_path=0,SEP='qxq'):
     fi=open(blast9_in_path)
     for line in fi:
         seq=line.rstrip().split('\t')
-        this_snv='\t'.join(seq[0].split(SEP)[0:6])
-        SNV[this_snv]=[0,0]
+        try:
+            #############################
+            test_tmp=seq[11] # test length
+            #############################
+            this_snv='\t'.join(seq[0].split(SEP)[0:6])
+            SNV[this_snv]=[0,0]
+        except OSError as error:
+            print(error)
     fi.close()
 
 
     fi=open(blast9_in_path)
     for line in fi:
         seq=line.rstrip().split('\t')
-        this_snv='\t'.join(seq[0].split(SEP)[0:6])
-        if int(seq[9])  > int(seq[8]):
-            SNV[this_snv][0]+=1
-        else:
-            SNV[this_snv][1]+=1
+        try:
+            #############################
+            test_tmp=seq[11] # test length
+            #############################
+            this_snv='\t'.join(seq[0].split(SEP)[0:6])
+            if int(seq[9])  > int(seq[8]):
+                SNV[this_snv][0]+=1
+            else:
+                SNV[this_snv][1]+=1
+        except OSError as error:
+            print(error)
     fi.close()
 
     fi=open(bed_in_path)
@@ -868,11 +897,6 @@ def getTandemRegion(blastall_in_path=0, resall_in_path=0, tandem_out_path=0, SEP
 #----------------------------------------------------------------------------
 
 
-
-
-
-
-
 #----------------------------------------------------------------------------
 ##########################################
 ##########################################
@@ -930,9 +954,9 @@ combineBed(bed_in_path_1=OUT_DIR+'/fc_res_dsrna.bed',bed_in_path_2=OUT_DIR+'/ff_
 summaryRES(bed_in_path=OUT_DIR+'/fc_res_dsrna.bed', txt_out_path=OUT_DIR+'/fc_res_dsrna.bed.summary.txt')
 summaryRES(bed_in_path=OUT_DIR+'/ff_res_anno.bed', txt_out_path=OUT_DIR+'/ff_res_anno.bed.summary.txt')
 summaryRES(bed_in_path=OUT_DIR+'/fg_res_all.bed', txt_out_path=OUT_DIR+'/fg_res_all.bed.summary.txt')
-getBedAD(bed_in_path=OUT_DIR+'/fg_res_all.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fh_res_all_AD.bed')
-getBedDP(bed_in_path=OUT_DIR+'/fh_res_all_AD.bed', bam_in_path=bam_in_path, bed_out_path=OUT_DIR+'/fi_res_all_AD_DP.bed',bedtools_path=bedtools_path)
 
+#getBedAD(bed_in_path=OUT_DIR+'/fg_res_all.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fh_res_all_AD.bed')
+#getBedDP(bed_in_path=OUT_DIR+'/fh_res_all_AD.bed', bam_in_path=bam_in_path, bed_out_path=OUT_DIR+'/fi_res_all_AD_DP.bed',bedtools_path=bedtools_path)
 #----------------------------------------------------------------------------
 
 
@@ -945,10 +969,12 @@ getBedDP(bed_in_path=OUT_DIR+'/fh_res_all_AD.bed', bam_in_path=bam_in_path, bed_
 
 
 #----------------------------------------------------------------------------
+print('#------ARES------\n')
 print('Finished !\n')
-print (time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-
-
+print( str(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))+'\n')
+print('Run_ID=\n')
+print(RUN_ID+'\n')
+print('#----------------\n')
 
 
 
