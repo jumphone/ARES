@@ -106,12 +106,13 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
         donee=[]
         lst=re.findall( '(\d+|\+|-|\*|/)', a )
         for i in a:
-            if i == 'I' or i == 'D' or i== 'M' or i=='S' or i=='P' or i=='N' :
+            if i == 'I' or i == 'D' or i== 'M' or i=='S' or i=='P' or i=='N' or i=='X' or i=='=':
                 donee.append(i)
         return donee,lst
     #donefunction
 
     def doneCG(CG,chrr,pos,seq,qseq):#pos is 1 base
+        
         donee,lst=doCG(CG)
         #print(donee, lst)
         errorsite=''
@@ -124,6 +125,9 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
         refpos=int(pos)-1
         seqpos=0
         step=0
+        chr_size=len(chrom[chrr])
+        seq_size=len(seq)
+
         while step<len(donee):
             if donee[step]=='I':
                 seqpos=seqpos+int(lst[step])
@@ -133,12 +137,13 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
                 refpos=refpos+int(lst[step])
             elif donee[step]=='S':
                 seqpos=seqpos+int(lst[step])
-            elif donee[step]=='M':
+            elif donee[step]=='M' or donee[step]=='X' or donee[step]=='=':
                 refseq=refseq+chrom[chrr][refpos:refpos+int(lst[step])]
                 seqseq=seqseq+seq[seqpos:seqpos+int(lst[step])]
                 j=refpos
                 jj=seqpos
-                while j<refpos+int(lst[step]):
+
+                while j<refpos+int(lst[step]) and j < chr_size and jj < seq_size:
                     try:
                         if chrom[chrr][j].upper() != seq[jj].upper() and chrom[chrr][j].upper() !='N' and seq[jj].upper() != 'N':
                             errorsite=errorsite+chrom[chrr][j].upper()+seq[jj].upper()+':'+str(j+1)+';'
@@ -152,6 +157,8 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
                 intersite=intersite+str(refpos+1)+':'+str(refpos+int(lst[step]))+';'
                 refpos=refpos+int(lst[step])
                 seqpos=seqpos+int(lst[step])
+            else:
+                break
             step=step+1
         refseq=refseq.upper()
         seqseq=seqseq.upper()
@@ -174,6 +181,8 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
         this_flag=str(line.flag)
         
         if this_chr!='*' and this_CG!='*' and this_CG!='None' :
+            #try:
+            if 1==1:
                 refseq,seqseq,errorsite,intersite,quasite,locsite,pieceloc=doneCG(this_CG, this_chr, this_pos, this_seq, this_qseq)
                 quasite=quasite[1:]
                 locsite=locsite[1:]
@@ -197,6 +206,9 @@ def bam2zz(bam_in_path=0,fa_in_path=0,zz_out_path=0):
                 this_out=this_chr+'\t'+this_flag+'\t'+this_mapq+'\t'+intersite[0:-1]+'\t'+errorsite[0:-1]+'\t'+quasite+'\t'+locsite+'\t'+this_seq+'\t'+this_name+'\t'+pieceloc+'\n'
                 if errorsite !='*;':
                     fo.write(this_out)  
+            #except ValueError:
+                #print([this_name, this_CG, this_chr, this_pos, this_seq, this_qseq])
+                pass
     fo.close()
 #----------------------------------------------------------------------------
 
