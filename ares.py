@@ -486,6 +486,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
 
 
     ##########################
+    '''
     REF={}
     fi=open(ref_in_path)
     l1=fi.readline()
@@ -507,6 +508,7 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
         l1=fi.readline()
         l2=fi.readline()
     fi.close()
+    '''
     #######################
     #import subprocess
 
@@ -534,13 +536,21 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
     #######################
 
     JOBS=[]
+    ###############
     queue = Queue()
     i=0
-    for this_id in QUERY:
+    ##########
+    fi=open(ref_in_path)
+    l1=fi.readline()
+    l2=fi.readline()
+    while l1 !='':
+        this_id=l1.rstrip().split(SEPR)[5]
+        #REF[this_id]=''
+        
         if i>=start_i:
             this_id=this_id
 
-            this_ref=REF[this_id]
+            this_ref=l1+l2
             this_query=QUERY[this_id]
 
             ##################################
@@ -564,10 +574,14 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
                     this_job.join()
                 JOBS=[]
             ##################################
+            l1=fi.readline()
+            l2=fi.readline()
             ##################################
             if i % 100 ==1:
                 open(count_out_path,'a').write(str(i)+'\n')
         i=i+1
+
+    fi.close()
 
     for this_job in JOBS:
         this_job.join()
