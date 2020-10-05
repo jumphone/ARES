@@ -1,5 +1,7 @@
 <img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_logo_text.png" width="360">
 
+ARES is designed for detecting RNA editing sites from RNA-seq data.
+
 ### Requirements
 
     python3  = 3.8.2
