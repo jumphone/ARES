@@ -10,7 +10,7 @@
 
 Users can download binary files of bedtools and blat from: https://github.com/jumphone/ARES/tree/master/bin
 
-Users can download repeat annotation file from: https://sourceforge.net/projects/sprintpy/files/dbRES/ [dbrep.zip]
+Users can download repeat annotation file from: https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
 
 ### Usage
 
