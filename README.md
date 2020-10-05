@@ -37,6 +37,12 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # bedtools_path: path to bedtools
     # blat_path: path to blat
 
+### Output folder
+
+    # fc_res_dsrna.bed: RESs identified by dsRNA-based part
+    # ff_res_anno.bed: RESs identified by annotation-based part
+    # fg_res_all.bed: all RESs identified by ARES
+
 
 ### Recommended alignmnet procedure (BWA-MEM)
 
