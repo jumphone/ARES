@@ -486,29 +486,6 @@ def blatAlign(ref_in_path=0, query_in_path=0, out_dir=0, blat_path=0, CPU=10,SEP
 
 
     ##########################
-    '''
-    REF={}
-    fi=open(ref_in_path)
-    l1=fi.readline()
-    l2=fi.readline()
-    while l1 !='':
-        this_id=l1.rstrip().split(SEPR)[5]
-        REF[this_id]=''
-        l1=fi.readline()
-        l2=fi.readline()
-    fi.close()
-
-    fi=open(ref_in_path)
-    l1=fi.readline()
-    l2=fi.readline()
-    while l1 !='':
-        this_id=l1.rstrip().split(SEPR)[5]
-        #print(this_id)
-        REF[this_id]+=l1+l2
-        l1=fi.readline()
-        l2=fi.readline()
-    fi.close()
-    '''
     #######################
     #import subprocess
 
@@ -865,62 +842,8 @@ def summaryRES(bed_in_path=0, txt_out_path=0):
 
 
 
-#----------------------------------------------------------------------------
-def getInvertedRegion(blastall_in_path=0, resall_in_path=0, inverted_out_path=0, SEPQ='qxq', SEPR='rxr', AROUND=20000 ):
-    f_blast=open(blastall_in_path)
-    f_resall=open(resall_in_path)
-    fo=open(inverted_out_path,'w')
-
-    CLST_SET=set()
-    for line in f_resall:
-        seq=line.rstrip().split('\t')
-        this_id=seq[5]
-        CLST_SET.add(this_id)
-
-    for line in f_blast:
-        seq=line.rstrip().split('\t')
-        
-        q_seq=seq[0].rstrip().split(SEPQ)
-        q_chr=q_seq[0]
-        q_start=int(q_seq[1])+1
-        q_end=int(q_seq[2])
-        q_type=q_seq[3]
-        q_num=q_seq[4]
-        q_id=q_seq[5]
-
-        r_seq=seq[1].rstrip().split(SEPR)
-        r_tag=r_seq[6]
-
-        q_pos=[int(seq[6]),int(seq[7])]
-        r_pos=[int(seq[8]),int(seq[9])]
-        
-        if r_tag == 'AFTER':
-            1+1
-
-    
-    fo.close()
-#----------------------------------------------------------------------------
 
 
-#----------------------------------------------------------------------------
-def getTandemRegion(blastall_in_path=0, resall_in_path=0, tandem_out_path=0, SEPQ='qxq', SEPR='rxr', AROUND=20000 ):
-    f_blast=open(blastall_in_path)
-    f_resall=open(resall_in_path)
-    fo=open(tandem_out_path,'w')
-
-    CLST_SET=set()
-    for line in f_resall:
-        seq=line.rstrip().split('\t')
-        this_id=seq[5]
-        CLST_SET.add(this_id)
-
-    for line in f_blast:
-        seq=line.rstrip().split('\t')
-     
-        
-    
-    fo.close()
-#----------------------------------------------------------------------------
 
 
 #----------------------------------------------------------------------------
