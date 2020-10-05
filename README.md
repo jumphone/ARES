@@ -15,8 +15,8 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
 ### Usage
 
 ### ARES-anno (use ARES with repeat annotation file)
-<!img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_role.png" width="100">
-
+    
+    
     python3  ares.py  bam_in_path  ref_in_path  OUT_DIR  bedtools_path  blat_path  anno_in_path
     
     # bam_in_path: path to aligned reads in BAM format
