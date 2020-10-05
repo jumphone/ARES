@@ -1,6 +1,6 @@
 <img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_logo_text.png" width="300">
 
-ARES is designed for detecting RNA editing sites from RNA-seq data.
+ARES is designed for detecting RNA editing sites from aligned RNA-seq data (in BAM format).
 
 ### Requirements
 
