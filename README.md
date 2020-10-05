@@ -57,13 +57,22 @@ bamUtil: https://github.com/statgen/bamUtil
     samtools  view  -b  reads.sam  >  reads.bam
     samtools  sort  reads.bam  >  reads.sorted.bam
     bam  dedup_LowMem  --rmDups  --in  reads.sorted.bam  --out  reads.sorted.rmdup.bam  --log  log.txt 
-    samtools index reads.sorted.rmdup.bam 
-    samtools stats reads.sorted.rmdup.bam > reads.stats.txt   
+    samtools  index  reads.sorted.rmdup.bam 
+    samtools  stats  reads.sorted.rmdup.bam  >  reads.stats.txt   
    
    
 ### Identify hyper-RESs (SPRINT)
 
 sprint: https://github.com/jumphone/SPRINT
 
-    samtools  view  -f4  -b  bam_in_path
-    samtools  bam2fq 
+    samtools  view  -f4  -b  reads.sorted.rmdup.bam  >  reads.unaligned.bam
+    samtools  bam2fq  reads.unaligned.bam  >  reads.unaligned.fastq
+    
+    sprint  main  reference.fasta  OUT_DIR  bwa_path  samtools_path
+    
+    # Please check https://github.com/jumphone/SPRINT for the usage of SPRINT
+    # when using sprint, the version of bwa should be 0.7.12, and the version of samtools should be 1.2.
+  
+  
+  
+  
