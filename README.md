@@ -14,6 +14,25 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
 
 ### Usage
 
+### Recommended pre-processing procedure
+    
+    # Build index
+    bwa  index  -a  bwtsw  reference.fasta 
+    
+    # Do reads aligment
+    bwa  mem  -t  cpu_number  reference.fasta  read_1.fastq  read_2.fastq  >  reads.sam
+
+    # Sort & remove PCR duplicates
+    samtools  view  -b  reads.sam  >  reads.bam
+    samtools  sort  reads.bam  >  reads.sorted.bam
+    bam  dedup_LowMem  --rmDups  --in  reads.sorted.bam  --out  reads.sorted.rmdup.bam  --log  log.txt 
+    samtools index reads.sorted.rmdup.bam 
+    samtools stats reads.sorted.rmdup.bam > reads.stats.txt
+    
+    
+    
+    
+
 ### ARES-anno (use ARES with repeat annotation file)
     
     
@@ -23,4 +42,24 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # ref_in_path: path to reference genome in FASTA format
     # OUT_DIR: ARES will generate a folder to store all results
     # bedtools_path: path to bedtools
-    # 
+    # blat_path: path to blat
+    # anno_in_path: path to repeat annotation file. Uers can download from https://sourceforge.net/projects/sprintpy/files/dbRES/
+ 
+ 
+### ARES-free (use ARES without repeat annotation file)    
+    
+    
+    python3  ares.py  bam_in_path  ref_in_path  OUT_DIR  bedtools_path  blat_path 
+    
+    # bam_in_path: path to aligned reads in BAM format
+    # ref_in_path: path to reference genome in FASTA format
+    # OUT_DIR: ARES will generate a folder to store all results
+    # bedtools_path: path to bedtools
+    # blat_path: path to blat
+
+
+### Detect hyper-RESs (use SPRINT to identify hyper-RESs)
+
+
+
+
