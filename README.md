@@ -24,7 +24,7 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # OUT_DIR: ARES will generate a folder to store all results
     # bedtools_path: path to bedtools
     # blat_path: path to blat
-    # anno_in_path: path to repeat annotation file. Uers can download from https://sourceforge.net/projects/sprintpy/files/dbRES/
+    # anno_in_path: path to repeat annotation file. Uers can download it from https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
  
  
 ### ARES-free (use ARES without repeat annotation file)    
