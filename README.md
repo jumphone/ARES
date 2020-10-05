@@ -8,9 +8,8 @@
     bedtools = v2.26.0    # https://bedtools.readthedocs.io/en/latest/
     blat     = v.36x7     # http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/blat/
 
-Users can download binary files of bedtools and blat from: https://github.com/jumphone/ARES/tree/master/bin
-
 Users can download repeat annotation file from: https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
+
 
 ### Usage
 
