@@ -14,28 +14,6 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
 
 ### Usage
 
-### Recommended alignmnet procedure (BWA-MEM)
-
-bwa: http://bio-bwa.sourceforge.net/
-
-samtools: http://www.htslib.org/download/
-
-bamUtil: https://github.com/statgen/bamUtil
-    
-    # Build index
-    bwa  index  -a  bwtsw  reference.fasta 
-    
-    # Do reads aligment
-    bwa  mem  -t  cpu_number  reference.fasta  read_1.fastq  read_2.fastq  >  reads.sam
-
-    # Sort & remove PCR duplicates
-    samtools  view  -b  reads.sam  >  reads.bam
-    samtools  sort  reads.bam  >  reads.sorted.bam
-    bam  dedup_LowMem  --rmDups  --in  reads.sorted.bam  --out  reads.sorted.rmdup.bam  --log  log.txt 
-    samtools index reads.sorted.rmdup.bam 
-    samtools stats reads.sorted.rmdup.bam > reads.stats.txt   
-    
-
 ### ARES-anno (use ARES with repeat annotation file)
     
     
@@ -61,6 +39,28 @@ bamUtil: https://github.com/statgen/bamUtil
     # blat_path: path to blat
 
 
+### Recommended alignmnet procedure (BWA-MEM)
+
+bwa: http://bio-bwa.sourceforge.net/
+
+samtools: http://www.htslib.org/download/
+
+bamUtil: https://github.com/statgen/bamUtil
+    
+    # Build index
+    bwa  index  -a  bwtsw  reference.fasta 
+    
+    # Do reads aligment
+    bwa  mem  -t  cpu_number  reference.fasta  read_1.fastq  read_2.fastq  >  reads.sam
+
+    # Sort & remove PCR duplicates
+    samtools  view  -b  reads.sam  >  reads.bam
+    samtools  sort  reads.bam  >  reads.sorted.bam
+    bam  dedup_LowMem  --rmDups  --in  reads.sorted.bam  --out  reads.sorted.rmdup.bam  --log  log.txt 
+    samtools index reads.sorted.rmdup.bam 
+    samtools stats reads.sorted.rmdup.bam > reads.stats.txt   
+   
+   
 ### Identify hyper-RESs (SPRINT)
 
 sprint: https://github.com/jumphone/SPRINT
