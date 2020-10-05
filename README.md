@@ -5,8 +5,8 @@
     python3  = 3.8.2
     pysam    = 0.16.0.1
     numpy    = 1.19.1
-    bedtools = v2.26.0    https://bedtools.readthedocs.io/en/latest/
-    blat     = v.36x7     http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/blat/ and https://www.genome.ucsc.edu/cgi-bin/hgBlat
+    bedtools = v2.26.0    # https://bedtools.readthedocs.io/en/latest/
+    blat     = v.36x7     # http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/blat/
 
 Users can download binary files of bedtools and blat from: https://github.com/jumphone/ARES/tree/master/bin
 
