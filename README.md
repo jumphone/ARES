@@ -46,7 +46,7 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # fg_res_all.bed: all RESs identified by ARES
 
 
-### Recommended alignmnet procedure (BWA-MEM)
+### Recommended alignment procedure (BWA-MEM)
 
 bwa: http://bio-bwa.sourceforge.net/
 
