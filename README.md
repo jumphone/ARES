@@ -75,7 +75,7 @@ sprint: https://github.com/jumphone/SPRINT
     samtools  view  -f4  -b  reads.sorted.rmdup.bam  >  reads.unaligned.bam
     samtools  bam2fq  reads.unaligned.bam  >  reads.unaligned.fastq
     
-    sprint  main  reference.fasta  OUT_DIR  bwa_path  samtools_path
+    sprint  main  -1  reads.unaligned.fastq  reference.fasta  OUT_DIR  bwa_path  samtools_path
     
     # Please check https://github.com/jumphone/SPRINT for the detailed usage of SPRINT
     # when using sprint, the version of bwa should be 0.7.12, and the version of samtools should be 1.2.
