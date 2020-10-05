@@ -14,7 +14,7 @@ ARES is designed for detecting RNA editing sites from RNA-seq data.
 
 ### Usage
 
-### ARES-anno (use ARES with repeat annotation file)
+### 1. ARES-anno (use ARES with repeat annotation file)
 
 Users can download repeat annotation file from: https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
     
@@ -28,7 +28,7 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # anno_in_path: path to repeat annotation file. Uers can download it from https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
  
  
-### ARES-free (use ARES without repeat annotation file)    
+### 2. ARES-free (use ARES without repeat annotation file)    
     
     
     python3  ares.py  bam_in_path  ref_in_path  OUT_DIR  bedtools_path  blat_path 
@@ -39,14 +39,14 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # bedtools_path: path to bedtools
     # blat_path: path to blat
 
-### Output folder
+### 3. Output folder
 
     # fc_res_dsrna.bed: RESs identified by dsRNA-based part
     # ff_res_anno.bed: RESs identified by annotation-based part
     # fg_res_all.bed: all RESs identified by ARES
 
 
-### Recommended alignment procedure (BWA-MEM)
+### 4. Recommended alignment procedure (BWA-MEM)
 
 bwa: http://bio-bwa.sourceforge.net/
 
@@ -68,7 +68,7 @@ bamUtil: https://github.com/statgen/bamUtil
     samtools  stats  reads.sorted.rmdup.bam  >  reads.stats.txt   
    
    
-### Identify hyper-RESs (SPRINT)
+### 5. Identify hyper-RESs (SPRINT)
 
 sprint: https://github.com/jumphone/SPRINT
 
