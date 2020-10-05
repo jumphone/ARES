@@ -3,7 +3,7 @@
 # Annotation-free toolkit for identifying Rna Editing Sites
 # Web site: https://github.com/jumphone/ARES
 # Author: Feng Zhang
-# Date: 2020.9
+# Date: 2020.10
 # Requirements:
 #     python3=3.8.2
 #     pysam=0.16.0.1
@@ -981,8 +981,9 @@ summaryRES(bed_in_path=OUT_DIR+'/fc_res_dsrna.bed', txt_out_path=OUT_DIR+'/fc_re
 summaryRES(bed_in_path=OUT_DIR+'/ff_res_anno.bed', txt_out_path=OUT_DIR+'/ff_res_anno.bed.summary.txt')
 summaryRES(bed_in_path=OUT_DIR+'/fg_res_all.bed', txt_out_path=OUT_DIR+'/fg_res_all.bed.summary.txt')
 
-#getBedAD(bed_in_path=OUT_DIR+'/fg_res_all.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fh_res_all_AD.bed')
-#getBedDP(bed_in_path=OUT_DIR+'/fh_res_all_AD.bed', bam_in_path=bam_in_path, bed_out_path=OUT_DIR+'/fi_res_all_AD_DP.bed',bedtools_path=bedtools_path)
+#----------------------------------------------------------------------------
+getBedAD(bed_in_path=OUT_DIR+'/fg_res_all.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fh_res_all_AD.bed')
+getBedDP(bed_in_path=OUT_DIR+'/fh_res_all_AD.bed', bam_in_path=bam_in_path, bed_out_path=OUT_DIR+'/fi_res_all_AD_DP.bed',bedtools_path=bedtools_path)
 #----------------------------------------------------------------------------
 
 
