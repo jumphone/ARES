@@ -1,5 +1,7 @@
 <img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_logo_text.png" width="300">
 
+Annotation-free toolkit for identifying RNA editing sites (ARES)
+
 ARES is designed for detecting RNA editing sites from aligned RNA-seq data (in BAM format).
 
 ### Requirements
