@@ -1,4 +1,6 @@
+
 <img src="https://github.com/jumphone/PhenoPro/raw/master/IMG/ARES_logo_text.png" width="300">
+
 
 Annotation-free toolkit for identifying RNA editing sites (ARES)
 
@@ -7,6 +9,8 @@ ARES is designed for detecting RNA editing sites from aligned RNA-seq data (in B
 When identifying RESs from aligned reads (regular-RESs), ARES shows much higher sensitivity than other existing tools (e.g. SPRINT). 
 
 We recommend users to use ARES and SPRINT to identify regular- and hyper- RESs, respectively.
+
+SPRINT: https://github.com/jumphone/SPRINT
 
 ### Requirements
 
