@@ -4,9 +4,9 @@ Annotation-free toolkit for identifying RNA editing sites (ARES)
 
 ARES is designed for detecting RNA editing sites from aligned RNA-seq data (in BAM format).
 
-#### ARES has significantly improved the sensitivity in detecting RESs from aligned reads (regular-RESs). 
+When identifying RESs from aligned reads (regular-RESs), ARES shows much higher sensitivity than other existing tools (e.g. SPRINT). 
 
-#### We recommend users to use ARES and SPRINT to identify regular- and hyper- RESs, respectively.
+We recommend users to use ARES and SPRINT to identify regular- and hyper- RESs, respectively.
 
 ### Requirements
 
