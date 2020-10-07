@@ -8,9 +8,9 @@ ARES is designed for detecting RNA editing sites from aligned RNA-seq data (in B
 
 ### Notes
 
-When identifying RESs from aligned reads (regular-RESs), ARES shows much higher sensitivity than other existing tools (e.g. SPRINT). 
+    When identifying RESs from aligned reads (regular-RESs), ARES shows much higher sensitivity than other existing tools (e.g. SPRINT). 
 
-We recommend users to use ARES and [SPRINT](https://github.com/jumphone/ARES/blob/master/README.md#5-identify-hyper-ress-sprint) to identify regular- and hyper- RESs, respectively.
+    We recommend users to use ARES and [SPRINT](https://github.com/jumphone/ARES/blob/master/README.md#5-identify-hyper-ress-sprint) to identify regular- and hyper- RESs, respectively.
 
 ### Requirements
 
