@@ -4,7 +4,7 @@
 
 Annotation-free toolkit for identifying RNA editing sites (ARES)
 
-ARES is designed for detecting RNA editing sites from aligned RNA-seq data (in BAM format).
+ARES is designed for detecting RNA Editing Sites (RESs) from aligned RNA-seq data.
 
 ### Notes
 
