@@ -19,7 +19,8 @@ ARES is designed for detecting RNA Editing Sites (RESs) from aligned RNA-seq dat
 * [Use SPRINT to identify hyper-RESs](https://github.com/jumphone/ARES#5-identify-hyper-ress-sprint)
 
 ### Requirements
-
+    
+    linux
     python3  = 3.8.2
     pysam    = 0.16.0.1
     numpy    = 1.19.1
