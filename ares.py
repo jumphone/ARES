@@ -884,10 +884,10 @@ filterDsrna(bed_in_path=OUT_DIR+'/fb_snv_duplet_blat_stats_AD.bed', bed_out_path
 # Annotation-based
 ########################
 getBedAD(bed_in_path=OUT_DIR+'/f5_snv_duplet_site.bed', allsnv_in_path=OUT_DIR+'/f2_snv.bed', bed_out_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed')
-try:
+if anno_in_path!=0:
     bedAnno(bed_in_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed', anno_in_path=anno_in_path, bed_out_path=OUT_DIR+'/fe_snv_duplet_site_AD_anno.bed', bedtools_path=bedtools_path)
     filterAnno(bed_in_path=OUT_DIR+'/fe_snv_duplet_site_AD_anno.bed', bed_out_path=OUT_DIR+'/ff_res_anno.bed')
-except ValueError:
+else:
     filterAnno(bed_in_path=OUT_DIR+'/fd_snv_duplet_site_AD.bed', bed_out_path=OUT_DIR+'/ff_res_anno.bed')
 
 
