@@ -6,7 +6,7 @@ Annotation-free toolkit for identifying RNA editing sites (ARES)
 
 ARES is designed for detecting RNA Editing Sites (RESs) from aligned RNA-seq data.
 
-### Notes
+## Notes
 
     Regular-RESs: RESs called from aligned reads.    Hyper-RESs: RESs called from re-aligned masked reads.
     
@@ -18,7 +18,7 @@ ARES is designed for detecting RNA Editing Sites (RESs) from aligned RNA-seq dat
 
 * [Use SPRINT to identify hyper-RESs](https://github.com/jumphone/ARES#5-identify-hyper-ress-sprint)
 
-### Requirements
+## Requirements
     
     linux
     python3  = 3.8.2
@@ -27,15 +27,15 @@ ARES is designed for detecting RNA Editing Sites (RESs) from aligned RNA-seq dat
     bedtools = v2.26.0    # https://bedtools.readthedocs.io/en/latest/
     blat     = v.36x7     # http://hgdownload.soe.ucsc.edu/admin/exe/linux.x86_64/blat/
 
-### Download ARES
+## Download ARES
 
     wget https://raw.githubusercontent.com/jumphone/ARES/master/ares.py
 
-### Usage
+## Usage
 
 ### 1. ARES-anno
 
-Note: use ARES with repeat annotation file ( **dsRNA-based part + annotation-based part + repeat annotation** )
+Use ARES with repeat annotation file ( **dsRNA-based part + annotation-based part + repeat annotation** )
 
 Users can download repeat annotation file from: https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
     
@@ -51,7 +51,7 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
  
 ### 2. ARES-free 
 
-Note: use ARES without repeat annotation file ( **dsRNA-based part + annotation-based part** )
+Use ARES without repeat annotation file ( **dsRNA-based part + annotation-based part** )
     
     python3  ares.py  bam_in_path  ref_in_path  OUT_DIR  bedtools_path  blat_path 
     
@@ -64,7 +64,7 @@ Note: use ARES without repeat annotation file ( **dsRNA-based part + annotation-
 
 ### 3. ARES-only-anno
 
-Note: use ARES without dsRNA-based part ( **only annotation-based part** )
+Use ARES without dsRNA-based part ( **only annotation-based part** )
 
 Download ares_onlyAnno.py
 
