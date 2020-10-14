@@ -33,7 +33,9 @@ ARES is designed for detecting RNA Editing Sites (RESs) from aligned RNA-seq dat
 
 ### Usage
 
-### 1. ARES-anno (use ARES with repeat annotation file, dsRNA-based part + annotation-based part + repeat annotation)
+### 1. ARES-anno
+
+Use ARES with repeat annotation file, dsRNA-based part + annotation-based part + repeat annotation
 
 Users can download repeat annotation file from: https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
     
@@ -47,7 +49,9 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # anno_in_path: path to repeat annotation file. Uers can download it from https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
  
  
-### 2. ARES-free (use ARES without repeat annotation file, dsRNA-based part + annotation-based part)    
+### 2. ARES-free 
+
+Use ARES without repeat annotation file, dsRNA-based part + annotation-based part    
     
     python3  ares.py  bam_in_path  ref_in_path  OUT_DIR  bedtools_path  blat_path 
     
@@ -58,7 +62,9 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # blat_path: path to blat
 
 
-### 3. ARES-only-anno (use ARES without dsRNA-based part, only annotation-based part)  
+### 3. ARES-only-anno
+
+Use ARES without dsRNA-based part, only annotation-based part
 
 Download ares_onlyAnno.py
 
