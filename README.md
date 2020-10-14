@@ -66,7 +66,7 @@ Use ARES without repeat annotation file ( **dsRNA-based part + annotation-based 
 
 Use ARES without dsRNA-based part ( **only annotation-based part** )
 
-Download ares_onlyAnno.py
+Download "ares_onlyAnno.py"
 
     wget https://raw.githubusercontent.com/jumphone/ARES/master/SupFiles/ares_onlyAnno.py
 
