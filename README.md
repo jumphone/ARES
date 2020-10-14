@@ -33,7 +33,7 @@ ARES is designed for detecting RNA Editing Sites (RESs) from aligned RNA-seq dat
 
 ### Usage
 
-### 1. ARES-anno (use ARES with repeat annotation file)
+### 1. ARES-anno (use ARES with repeat annotation file, dsRNA-based part + annotation-based part + repeat annotation)
 
 Users can download repeat annotation file from: https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
     
@@ -47,8 +47,7 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # anno_in_path: path to repeat annotation file. Uers can download it from https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
  
  
-### 2. ARES-free (use ARES without repeat annotation file)    
-    
+### 2. ARES-free (use ARES without repeat annotation file, dsRNA-based part + annotation-based part)    
     
     python3  ares.py  bam_in_path  ref_in_path  OUT_DIR  bedtools_path  blat_path 
     
@@ -58,14 +57,32 @@ Users can download repeat annotation file from: https://sourceforge.net/projects
     # bedtools_path: path to bedtools
     # blat_path: path to blat
 
-### 3. Output folder
+
+### 3. ARES-only-anno (use ARES without dsRNA-based part, only annotation-based part)  
+
+Download ares_onlyAnno.py
+
+    wget https://raw.githubusercontent.com/jumphone/ARES/master/SupFiles/ares_onlyAnno.py
+
+Usage
+
+    python3  ares_onlyAnno.py  bam_in_path  ref_in_path  OUT_DIR  bedtools_path  anno_in_path
+    
+    # bam_in_path: path to aligned reads in BAM format
+    # ref_in_path: path to reference genome in FASTA format
+    # OUT_DIR: ARES will generate a folder to store all results
+    # bedtools_path: path to bedtools
+    # anno_in_path (optional): path to repeat annotation file. Uers can download it from https://sourceforge.net/projects/sprintpy/files/dbRES/, "dbrep.zip"
+
+
+### 4. Output folder
 
     # fc_res_dsrna.bed: RESs identified by dsRNA-based part
     # ff_res_anno.bed: RESs identified by annotation-based part
     # fg_res_all.bed: all RESs identified by ARES
 
 
-### 4. Recommended alignment procedure (BWA-MEM)
+### 5. Recommended alignment procedure (BWA-MEM)
 
 bwa: http://bio-bwa.sourceforge.net/
 
@@ -87,7 +104,7 @@ bamUtil: https://github.com/statgen/bamUtil
     samtools  stats  reads.sorted.rmdup.bam  >  reads.stats.txt   
    
    
-### 5. Identify hyper-RESs (SPRINT)
+### 6. Identify hyper-RESs (SPRINT)
 
 sprint: https://github.com/jumphone/SPRINT
 
