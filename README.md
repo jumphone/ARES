@@ -16,7 +16,7 @@ ARES is designed for detecting RNA Editing Sites (RESs) from aligned RNA-seq dat
 
 * [Use ARES to identify regular-RESs](https://github.com/jumphone/ARES#usage)
 
-* [Use SPRINT to identify hyper-RESs](https://github.com/jumphone/ARES#5-identify-hyper-ress-sprint)
+* [Use SPRINT to identify hyper-RESs](https://github.com/jumphone/ARES#6-identify-hyper-ress-sprint)
 
 ## Requirements
     
