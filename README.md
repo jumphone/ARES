@@ -8,7 +8,9 @@ ARES is designed for detecting RNA Editing Sites (RESs) from aligned RNA-seq dat
 
 ## Notes
 
-    Regular-RESs: RESs called from aligned reads.    Hyper-RESs: RESs called from re-aligned masked reads.
+    Regular-RESs: RESs called from aligned reads.    
+    
+    Hyper-RESs: RESs called from re-aligned masked reads.
     
     When identifying regular-RESs, ARES shows much higher sensitivity than other existing tools (e.g. SPRINT). 
     
